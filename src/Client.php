@@ -10,15 +10,22 @@ use Monolog\Handler\StreamHandler;
 class Client {
 
   const DEBUG = false;
-  const SAL_API_URL = 'http://api.socialandloyal.xyz';
+  const SAL_API_URL = 'https://api.socialandloyal.com';
+  const SAL_DEBUG_API_URL = 'http://api.socialandloyal.xyz';
 
   const SAL_API_PORT = 80;
   const API_VERSION = '1';
   
-  public function __construct($public_key='', $private_key='', $client_name='') {
+  public function __construct($public_key='', $private_key='', $client_name='', $debug = false) {
     $this->public_key = $public_key;
     $this->private_key = $private_key;
     $this->client_name = $client_name;
+    $this->url = $client_name;
+    
+    $this->url = Client::SAL_API_URL;
+    if ($debug) {
+        $this->url = Client::SAL_DEBUG_API_URL;
+    }
   }
 
   private function gen_headers(){
@@ -113,7 +120,7 @@ class Client {
         $params_data['password'] = $this->bcrypt($password, 10);
     }
                 
-    return $this->_post(Client::SAL_API_URL.'/users', $params_data);
+    return $this->_post($this->url.'/users', $params_data);
 
 
   }
@@ -123,7 +130,7 @@ class Client {
       'client_name' => $this->client_name,
     );
     
-    $response = $this->_get(Client::SAL_API_URL."/users/external_id/$external_id" , $params_data);
+    $response = $this->_get($this->url."/users/external_id/$external_id" , $params_data);
     return $response->data;
   }
 
@@ -131,7 +138,7 @@ class Client {
       $params_data = array(
         'client_name' => $this->client_name,
       );
-      $response = $this->_get(Client::SAL_API_URL."/users/external_id/$external_id/movements" , $params_data);
+      $response = $this->_get($this->url."/users/external_id/$external_id/movements" , $params_data);
       return $response->data;
   }
 
@@ -139,7 +146,7 @@ class Client {
       $params_data = array(
         'client_name' => $this->client_name,
       );
-      $response = $this->_get(Client::SAL_API_URL."/users/email/$email" , $params_data);
+      $response = $this->_get($this->url."/users/email/$email" , $params_data);
       return $response->data;
   }
 
@@ -147,7 +154,7 @@ class Client {
       $params_data = array(
         'client_name' => $this->client_name,
       );
-      $response = $this->_get(Client::SAL_API_URL."/users/$user_id" , $params_data);
+      $response = $this->_get($this->url."/users/$user_id" , $params_data);
       return $response->data;
   }
 
@@ -157,7 +164,7 @@ class Client {
         'client_name' => $this->client_name,
         'external_id' => $external_id
       );
-      $response = $this->_put(Client::SAL_API_URL."/users/user_id/$user_id", $params_data);
+      $response = $this->_put($this->url."/users/user_id/$user_id", $params_data);
       return $response['data'];
   }
 
@@ -169,7 +176,7 @@ class Client {
                   'points'         => $points,
                   'price'          => $price
               );
-      $response = $this->_post(Client::SAL_API_URL."/users/$external_id/external_transactions" , $params_data);
+      $response = $this->_post($this->url."/users/$external_id/external_transactions" , $params_data);
       return $response;
   }
 
@@ -179,7 +186,7 @@ class Client {
         'client_name' => $this->client_name,
         'external_id' => $external_id,
     );
-    $response = $this->_get(Client::SAL_API_URL."/widgetToken" , $params_data);
+    $response = $this->_get($this->url."/widgetToken" , $params_data);
     return $response->data;
   }
 
