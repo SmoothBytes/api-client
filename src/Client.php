@@ -10,7 +10,7 @@ use Monolog\Handler\StreamHandler;
 class Client {
 
   const DEBUG = false;
-  const SAL_API_URL = 'https://api2.socialandloyal.com';
+  const SAL_API_URL = 'http://api.socialandloyal.xyz';
 
   const SAL_API_PORT = 80;
   const API_VERSION = '1';
@@ -81,9 +81,19 @@ class Client {
     $response = curl_exec($ch);
     return json_decode($response);
   }
+    
+  protected function bcrypt($password, $cost)
+  {
+      $chars = './ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      $salt = sprintf('$2a$%02d$', $cost);
+      for ($i = 0; $i < 22;
+           $i++) {
+          $salt .= $chars[rand(0, 63)];
+      }
+      return crypt($password, $salt);
+  }
 
-
-  public function register_user($external_id, $name, $surname, $email, $birthday='', $location='', $gender=''){
+  public function register_user($external_id, $name, $surname, $email, $password = null, $birthday='', $location='', $gender=''){
     
     // *************************
     // POST /users
@@ -98,8 +108,12 @@ class Client {
                 'location'    => $location,
                 'gender'      => $gender
             );
+            
+    if ($password != null) {
+        $params_data['password'] = $this->bcrypt($password, 10);
+    }
                 
-    return $this->_post(Socialandloyal_Api::SAL_API_URL.'/users', $params_data);
+    return $this->_post(Client::SAL_API_URL.'/users', $params_data);
 
 
   }
@@ -109,7 +123,7 @@ class Client {
       'client_name' => $this->client_name,
     );
     
-    $response = $this->_get(Socialandloyal_Api::SAL_API_URL."/users/external_id/$external_id" , $params_data);
+    $response = $this->_get(Client::SAL_API_URL."/users/external_id/$external_id" , $params_data);
     return $response->data;
   }
 
@@ -117,7 +131,7 @@ class Client {
       $params_data = array(
         'client_name' => $this->client_name,
       );
-      $response = $this->_get(Socialandloyal_Api::SAL_API_URL."/users/external_id/$external_id/movements" , $params_data);
+      $response = $this->_get(Client::SAL_API_URL."/users/external_id/$external_id/movements" , $params_data);
       return $response->data;
   }
 
@@ -125,7 +139,7 @@ class Client {
       $params_data = array(
         'client_name' => $this->client_name,
       );
-      $response = $this->_get(Socialandloyal_Api::SAL_API_URL."/users/email/$email" , $params_data);
+      $response = $this->_get(Client::SAL_API_URL."/users/email/$email" , $params_data);
       return $response->data;
   }
 
@@ -133,7 +147,7 @@ class Client {
       $params_data = array(
         'client_name' => $this->client_name,
       );
-      $response = $this->_get(Socialandloyal_Api::SAL_API_URL."/users/$user_id" , $params_data);
+      $response = $this->_get(Client::SAL_API_URL."/users/$user_id" , $params_data);
       return $response->data;
   }
 
@@ -143,7 +157,7 @@ class Client {
         'client_name' => $this->client_name,
         'external_id' => $external_id
       );
-      $response = $this->_put(Socialandloyal_Api::SAL_API_URL."/users/user_id/$user_id", $params_data);
+      $response = $this->_put(Client::SAL_API_URL."/users/user_id/$user_id", $params_data);
       return $response['data'];
   }
 
@@ -155,7 +169,7 @@ class Client {
                   'points'         => $points,
                   'price'          => $price
               );
-      $response = $this->_post(Socialandloyal_Api::SAL_API_URL."/users/$external_id/external_transactions" , $params_data);
+      $response = $this->_post(Client::SAL_API_URL."/users/$external_id/external_transactions" , $params_data);
       return $response;
   }
 
@@ -165,7 +179,7 @@ class Client {
         'client_name' => $this->client_name,
         'external_id' => $external_id,
     );
-    $response = $this->_get(Socialandloyal_Api::SAL_API_URL."/widgetToken" , $params_data);
+    $response = $this->_get(Client::SAL_API_URL."/widgetToken" , $params_data);
     return $response->data;
   }
 
