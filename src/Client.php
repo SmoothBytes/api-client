@@ -11,7 +11,7 @@ class Client {
 
   const DEBUG = false;
   const SAL_API_URL = 'https://api.socialandloyal.com';
-  const SAL_DEBUG_API_URL = 'http://api.socialandloyal.xyz';
+  const SAL_DEBUG_API_URL = 'https://api.socialandloyal.xyz';
 
   const SAL_API_PORT = 80;
   const API_VERSION = '1';
